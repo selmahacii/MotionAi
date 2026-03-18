@@ -357,27 +357,29 @@ class KeypointEmbedding(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Args:
-            x: Keypoint sequence (B, T, K, D) or (B, T, K*D)
+            x: Keypoint sequence (B, T, K, D)
         
         Returns:
-            embeddings: (B, T, K, d_model) or (B, T, d_model)
+            embeddings: (B, T, d_model)
         """
-        if self.use_keypoint_embedding:
-            # (B, T, K, D) -> (B, T, K, d_model)
-            B, T, K, D = x.shape
-            x = self.keypoint_embed(x)
+        if x.dim() == 3:
+            # If already flattened (B, T, K*D), reshape back if possible
+            B, T, KD = x.shape
+            x = x.view(B, T, self.num_keypoints, self.keypoint_dim)
             
-            # Add keypoint position embedding
+        B, T, K, D = x.shape
+        
+        if self.use_keypoint_embedding:
+            # Per-keypoint embedding
+            x = self.keypoint_embed(x)
+            # Add spatial position info
             kp_pos = torch.arange(K, device=x.device)
             x = x + self.keypoint_pos(kp_pos).unsqueeze(0).unsqueeze(0)
-            
-            # Flatten keypoints
-            x = x.view(B, T, K * x.size(-1))
+            # Global pooling/reduction to d_model
+            x = x.mean(dim=2) # Combine keypoints into a single frame vector
         else:
-            # (B, T, K, D) -> (B, T, K*D)
-            if x.dim() == 4:
-                B, T, K, D = x.shape
-                x = x.view(B, T, K * D)
+            # Traditional flattened embedding
+            x = x.view(B, T, K * D)
             x = self.spatial_embed(x)
         
         return x
