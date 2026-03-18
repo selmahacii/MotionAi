@@ -181,11 +181,9 @@ class AnalyticEngine(BaseEngine):
 
     def _run_pose_estimation(self, frame: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         # Implementation internal transformation logic
-        from src.pipeline import extract_keypoints_from_heatmaps
-        
         h_orig, w_orig = frame.shape[:2]
         from PIL import Image
-        img = Image.fromarray(frame[..., ::-1] if frame.shape[-1] == 3 else frame)
+        img = Image.fromarray(frame[..., ::-1] if (len(frame.shape) == 3 and frame.shape[-1] == 3) else frame)
         img = img.resize((posenet_config.input_size, posenet_config.input_size), Image.BILINEAR)
         tensor = torch.from_numpy(np.array(img).astype(np.float32) / 255.0).permute(2, 0, 1).unsqueeze(0).to(self.device)
         
@@ -200,7 +198,8 @@ class AnalyticEngine(BaseEngine):
         if len(self.coordinate_buffer) < 10:
             return 0, 0.0, np.zeros(len(MOVEMENT_CLASSES))
         
-        seq = list(self.coordinate_buffer)[-classifier_config.sequence_length:]
+        coords_list = list(self.coordinate_buffer)
+        seq = coords_list[-classifier_config.sequence_length:]
         if len(seq) < classifier_config.sequence_length:
             seq = [seq[0]] * (classifier_config.sequence_length - len(seq)) + seq
             
@@ -217,7 +216,8 @@ class AnalyticEngine(BaseEngine):
         if len(self.coordinate_buffer) < predictor_config.past_len:
             return np.array([])
         
-        seq = list(self.coordinate_buffer)[-predictor_config.past_len:]
+        coords_list = list(self.coordinate_buffer)
+        seq = coords_list[-predictor_config.past_len:]
         tensor = torch.FloatTensor(np.array(seq)).unsqueeze(0).to(self.device)
         tensor = normalize_sequence_by_torso(tensor)
         

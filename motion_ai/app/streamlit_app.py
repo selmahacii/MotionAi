@@ -30,7 +30,7 @@ from src.config import (
     SKELETON_CONNECTIONS,
     posenet_config, classifier_config, predictor_config
 )
-from src.pipeline import create_pipeline, MotionPipeline, MockMotionPipeline, InferenceResult
+from src.pipeline import create_engine, BaseEngine, AnalyticEngine, SimulatedEngine, SME_DataPacket
 from src.visualization import draw_skeleton, create_multi_skeleton_view
 
 
@@ -88,19 +88,19 @@ st.markdown("""
 
 
 @st.cache_resource
-def load_pipeline(
+def load_engine(
     posenet_path: Optional[str] = None,
     classifier_path: Optional[str] = None,
     predictor_path: Optional[str] = None,
-    use_mock: bool = True
-) -> MotionPipeline:
-    """Load the inference pipeline (cached)."""
-    return create_pipeline(
+    use_simulation: bool = True
+) -> BaseEngine:
+    """Load the Selma Motion Analytic Engine (cached)."""
+    return create_engine(
         posenet_path=posenet_path,
         classifier_path=classifier_path,
         predictor_path=predictor_path,
         device="cpu",
-        use_mock=use_mock
+        use_simulation=use_simulation
     )
 
 
@@ -352,17 +352,17 @@ def main():
             index=1  # Default to walking
         )
     
-    # Initialize pipeline
-    pipeline = load_pipeline(
+    # Initialize Selma Engine
+    engine = load_engine(
         posenet_path=posenet_path,
         classifier_path=classifier_path,
         predictor_path=predictor_path,
-        use_mock=use_mock
+        use_simulation=use_mock
     )
     
-    # Set demo class if mock
-    if use_mock and hasattr(pipeline, 'current_class'):
-        pipeline.current_class = demo_class
+    # Set demo profile if simulated
+    if use_mock and hasattr(engine, 'current_profile'):
+        engine.current_profile = demo_class
     
     # Session state for history
     if 'keypoint_history' not in st.session_state:
@@ -389,7 +389,7 @@ def main():
             run_analysis = st.button("▶️ Start Analysis", type="primary")
         with col2:
             if st.button("🔄 Reset"):
-                pipeline.reset()
+                engine.reset()
                 st.session_state.keypoint_history = []
                 st.session_state.class_history = []
                 st.session_state.frame_count = 0
@@ -410,20 +410,20 @@ def main():
             progress_bar = st.progress(0)
             
             for frame_idx in range(n_frames):
-                # Update demo class if changed
-                if use_mock and hasattr(pipeline, 'current_class'):
-                    pipeline.current_class = demo_class
+                # Execute SME Analysis cycle
+                if use_mock and hasattr(engine, 'current_profile'):
+                    engine.current_profile = demo_class
                 
-                # Process frame
-                result = pipeline.process_frame(fake_frame)
+                # Fetch DataPacket
+                result = engine.process_frame(fake_frame)
                 
-                # Update history
+                # Update trajectory history
                 st.session_state.keypoint_history.append(result.keypoints)
                 st.session_state.class_history.append({
                     'class': result.predicted_class,
                     'confidence': result.class_confidence
                 })
-                st.session_state.frame_count += 1
+                st.session_state.frame_count += result.frame_idx
                 
                 # Limit history size
                 if len(st.session_state.keypoint_history) > 100:
@@ -591,10 +591,10 @@ def main():
                 st.info("Not trained yet. Run `python models/predictor/train.py`")
     
     with tab3:
-        st.header("🧠 Model Architecture")
+        st.header("⚙️ System Architecture")
         
         st.markdown("""
-        The Human Motion Intelligence System consists of three AI models built from scratch:
+        The Selma Motion Engine consists of three optimized analytic components:
         """)
         
         col1, col2, col3 = st.columns(3)
