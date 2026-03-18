@@ -11,7 +11,7 @@ from matplotlib.figure import Figure
 import io
 
 import sys
-sys.path.append('/home/z/my-project/motion_ai')
+import os, sys; sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) if 'models' not in str(C:\Users\ZBOOK\Downloads\MotionAi\motion_ai\src\visualization.py.FullName) else sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from src.config import (
     NUM_KEYPOINTS, KEYPOINT_DIM,
     SKELETON_CONNECTIONS, MOVEMENT_CLASSES

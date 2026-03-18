@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 # Add project root
-sys.path.insert(0, str(Path(__file__).parent.parent))
+import os, sys; sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 import numpy as np
 

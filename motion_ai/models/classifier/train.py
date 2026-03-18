@@ -29,7 +29,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 # Add project root to path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+import os, sys; sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from models.classifier.architecture import MoveClassifier, LightweightClassifier
 from models.classifier.dataset import PoseSequenceDataset, create_dataloaders

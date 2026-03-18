@@ -18,7 +18,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader, random_split
 
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+import os, sys; sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from models.classifier.architecture import MoveClassifier
 from src.config import ClassifierConfig, TrainingConfig, NUM_KEYPOINTS, NUM_CLASSES

@@ -18,7 +18,7 @@ import argparse
 from pathlib import Path
 
 # Add project root to path
-sys.path.insert(0, str(Path(__file__).parent))
+import os, sys; sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from src.config import PoseNetConfig, ClassifierConfig, PredictorConfig, TrainingConfig
 

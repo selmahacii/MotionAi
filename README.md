@@ -1,43 +1,76 @@
-# 🏃 Selma Motion Engine (SME)
-**High-Precision Human Motion Analysis Framework**
+# Selma Motion Engine (SME)
 
-Engineered by Selma Haci.
+Proprietary Engineering by Selma Haci
 
 ---
 
-## 🔧 Core Architecture
-
-The Selma Motion Engine is a three-stage analytic pipeline optimized for real-time biomechanical assessment. It leverages a hierarchical processing structure to transform raw visual data into predictive movement insights.
+## Technical System Flow
 
 ```mermaid
 graph TD
     subgraph "Data Acquisition"
         I[Input Stream] --> V[Visual Processing]
+        V --> N[Normalization]
     end
     
-    subgraph "Analytic Core"
-        V --> PE[Pose Estimation]
-        PE --> PC[Pattern Classification]
-        PC --> FM[Future Modeling]
+    subgraph "Analytic Core (SME Engine)"
+        N --> PE[Pose Estimation - Stage 1]
+        PE --> PC[Activity Classification - Stage 2]
+        PC --> FM[Temporal Prediction - Stage 3]
     end
     
-    subgraph "Insight Distribution"
-        FM --> UI[Client Interface]
-        PC --> DB[(Secure Storage)]
+    subgraph "Output Distribution"
+        FM --> UI[Client Portal]
+        PC --> DB[Secure Analytics Store]
+        PE --> DP[Data Packet Serializer]
     end
 ```
 
-## 🏗️ System Hierarchy
+---
 
-1. **Precision Pose Estimator**: Extracts anatomical coordinates with head-normalized accuracy.
-2. **Activity Profile Classifier**: Analyzes movement sequences to identify specific physical profiles.
-3. **Temporal Predictor**: Forecasts probable future frame sequences using attention-weighted modeling.
+## Core Engine Hierarchy
 
-## 🚀 Engine Specifications
+```mermaid
+classDiagram
+    class BaseEngine {
+        <<Abstract>>
+        +process_frame(frame) DataPacket
+        +reset()
+        +get_diagnostics() Dict
+    }
+    class AnalyticEngine {
+        -SME_PoseEstimator
+        -SME_ActivityClassifier
+        -SME_TemporalPredictor
+        +process_frame(frame) DataPacket
+    }
+    class SimulatedEngine {
+        +process_frame(stub) DataPacket
+    }
+    BaseEngine <|-- AnalyticEngine
+    BaseEngine <|-- SimulatedEngine
+```
 
-- **Latency**: Sub-30ms end-to-end processing.
-- **Precision**: 17 Optimized Keypoint tracking.
-- **Coverage**: 35+ Standard activity patterns supported.
+---
+
+## Neural Processing Pipeline
+
+```mermaid
+sequenceDiagram
+    participant V as Video Input
+    participant S1 as Stage 1: PoseNet
+    participant S2 as Stage 2: MoveClassifier
+    participant S3 as Stage 3: MotionFormer
+    participant O as SME DataPacket
+
+    V->>S1: Raw Frame (RGB)
+    S1->>S1: Heatmap Extraction
+    S1->>S2: Anatomical Coordinates (17 Keypoints)
+    S2->>S2: Temporal Self-Attention
+    S2->>S3: Motion Profile + Features
+    S3->>S3: Autoregressive Forecast
+    S3->>O: Consolidated Analytic Packet
+```
 
 ---
 

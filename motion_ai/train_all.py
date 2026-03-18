@@ -10,7 +10,7 @@ import argparse
 from pathlib import Path
 
 # Add project root to path
-sys.path.insert(0, str(Path(__file__).parent))
+import os, sys; sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from models.posenet.train import train_posenet
 from models.classifier.train import train_classifier

@@ -14,7 +14,7 @@ import numpy as np
 from PIL import Image
 
 # Add project root to path
-sys.path.insert(0, str(Path(__file__).parent))
+import os, sys; sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from src.pipeline import create_pipeline, MotionPipeline
 from src.visualization import draw_skeleton, draw_prediction_overlay

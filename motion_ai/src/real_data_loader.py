@@ -15,7 +15,7 @@ import numpy as np
 from tqdm import tqdm
 
 import sys
-sys.path.insert(0, str(Path(__file__).parent.parent))
+import os, sys; sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from src.config import NUM_KEYPOINTS, MOVEMENT_CLASSES, NUM_CLASSES, DataConfig
 

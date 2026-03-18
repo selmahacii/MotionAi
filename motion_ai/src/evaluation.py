@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from collections import defaultdict
 
 import sys
-sys.path.append('/home/z/my-project/motion_ai')
+import os, sys; sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) if 'models' not in str(C:\Users\ZBOOK\Downloads\MotionAi\motion_ai\src\evaluation.py.FullName) else sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from src.config import NUM_KEYPOINTS, MOVEMENT_CLASSES
 
 

@@ -21,7 +21,7 @@ import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader, random_split
 
 # Add project root to path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+import os, sys; sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from models.posenet.architecture import StackedHourglass
 from models.posenet.loss import PoseNetLoss, generate_batch_heatmaps

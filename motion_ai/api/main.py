@@ -18,7 +18,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 # Add project root to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
+import os, sys; sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from src.pipeline import create_pipeline, MotionPipeline, MockMotionPipeline, InferenceResult
 from src.config import NUM_KEYPOINTS, MOVEMENT_CLASSES
