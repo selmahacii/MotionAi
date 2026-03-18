@@ -1,11 +1,6 @@
 """
-Real-time Inference Pipeline for Human Motion Intelligence System.
-Integrates all three models for end-to-end motion analysis.
-
-Pipeline:
-1. PoseNet (Stacked Hourglass) extracts keypoints from image
-2. MoveClassifier (BiLSTM + Attention) determines movement class
-3. MotionFormer (Transformer) forecasts future motion
+Real-time Inference Pipeline for Motion Analysis System.
+Developed by Selma Haci.
 """
 
 import os
@@ -295,7 +290,8 @@ class MotionPipeline:
         
         # Get recent keypoint sequence
         seq_length = classifier_config.sequence_length
-        keypoints = list(self.keypoint_buffer)[-seq_length:]
+        buffer_list = list(self.keypoint_buffer)
+        keypoints = buffer_list[-seq_length:] if len(buffer_list) >= seq_length else buffer_list
         
         # Pad if needed
         if len(keypoints) < seq_length:
@@ -326,7 +322,8 @@ class MotionPipeline:
         
         # Get input sequence
         input_length = predictor_config.past_len
-        keypoints = list(self.keypoint_buffer)[-input_length:]
+        buffer_list = list(self.keypoint_buffer)
+        keypoints = buffer_list[-input_length:] if len(buffer_list) >= input_length else buffer_list
         
         # Normalize
         keypoints = np.array(keypoints)
@@ -347,58 +344,117 @@ class MotionPipeline:
     
     def get_model_info(self) -> Dict[str, Any]:
         """Get information about loaded models."""
-        info = {
-            "device": str(self.device),
-            "buffer_size": len(self.keypoint_buffer),
-            "models_loaded": self.models_loaded,
-            "models": {}
-        }
+        models_info = {}
         
         if self.posenet is not None:
-            info["models"]["posenet"] = {
-                "name": "StackedHourglass",
+            models_info["posenet"] = {
+                "name": "PoseEstimator",
                 "params": sum(p.numel() for p in self.posenet.parameters()),
-                "n_stacks": posenet_config.n_stacks,
-                "n_features": posenet_config.n_features
             }
         
         if self.classifier is not None:
-            info["models"]["classifier"] = {
-                "name": "MoveClassifier",
+            models_info["classifier"] = {
+                "name": "MovementClassifier",
                 "params": sum(p.numel() for p in self.classifier.parameters()),
-                "d_model": classifier_config.d_model,
-                "n_layers": classifier_config.n_layers
             }
         
         if self.predictor is not None:
-            info["models"]["predictor"] = {
+            models_info["predictor"] = {
                 "name": "MotionFormer",
                 "params": sum(p.numel() for p in self.predictor.parameters()),
-                "d_model": predictor_config.d_model,
-                "n_heads": predictor_config.n_heads
             }
+            
+        return {
+            "device": str(self.device),
+            "buffer_size": len(self.keypoint_buffer),
+            "models_loaded": self.models_loaded,
+            "models": models_info
+        }
+
+
+class MockMotionPipeline:
+    """Mock pipeline for development and demo purposes."""
+    
+    def __init__(self, use_mock: bool = True, device: str = "cpu", **kwargs):
+        self.device = device
+        self.keypoint_buffer = deque(maxlen=60)
+        self.frame_idx = 0
+        self.current_class = 1  # default walking
+        print("✓ MockMotionPipeline initialized (Demo mode)")
         
-        return info
+    def process_frame(self, frame: np.ndarray) -> InferenceResult:
+        """Generate synthetic motion result."""
+        time.sleep(0.01)  # small delay
+        
+        # Generate synthetic standing/walking pose
+        phase = self.frame_idx / 15.0
+        offset = 0.02 * np.sin(phase)
+        
+        # Standard base pose (standing)
+        keypoints = np.array([
+            [0.5, 0.1], [0.47, 0.08], [0.53, 0.08], [0.44, 0.1], [0.56, 0.1],
+            [0.4, 0.25], [0.6, 0.25], [0.35, 0.4+offset], [0.65, 0.4-offset],
+            [0.3, 0.5+offset], [0.7, 0.5-offset], [0.45, 0.55], [0.55, 0.55],
+            [0.43, 0.75+offset], [0.57, 0.75-offset], [0.42, 0.9+offset], [0.58, 0.9-offset]
+        ])
+        
+        # Add tiny bit of jitter
+        keypoints += np.random.randn(17, 2) * 0.002
+        
+        scores = np.ones(17) * 0.95
+        probs = np.zeros(len(MOVEMENT_CLASSES))
+        probs[self.current_class] = 0.9
+        probs[(self.current_class + 1) % len(probs)] = 0.1
+        
+        # Generate predicted motion (next 10 frames)
+        predicted = []
+        for f in range(1, 11):
+            p_phase = (self.frame_idx + f) / 15.0
+            p_offset = 0.02 * np.sin(p_phase)
+            p_kp = keypoints.copy()
+            p_kp[:, 1] += p_offset * 0.5  # slight vertical movement
+            predicted.append(p_kp)
+            
+        result = InferenceResult(
+            keypoints=keypoints,
+            keypoint_scores=scores,
+            predicted_class=self.current_class,
+            class_name=MOVEMENT_CLASSES[self.current_class],
+            class_confidence=0.9,
+            class_probabilities=probs,
+            predicted_motion=np.array(predicted),
+            frame_idx=self.frame_idx,
+            inference_time_ms=10.0
+        )
+        
+        self.frame_idx += 1
+        return result
+        
+    def reset(self):
+        self.frame_idx = 0
+        self.keypoint_buffer.clear()
+    
+    def get_model_info(self) -> Dict[str, Any]:
+        return {
+            "device": str(self.device),
+            "demo_mode": True,
+            "models_loaded": True
+        }
 
 
 def create_pipeline(
     posenet_path: Optional[str] = None,
     classifier_path: Optional[str] = None,
     predictor_path: Optional[str] = None,
-    device: str = "cpu"
-) -> MotionPipeline:
+    device: str = "cpu",
+    use_mock: bool = False
+) -> Any:
     """
     Factory function to create inference pipeline.
-    
-    Args:
-        posenet_path: Path to PoseNet weights
-        classifier_path: Path to Classifier weights
-        predictor_path: Path to Predictor weights
-        device: Device for inference
-    
-    Returns:
-        MotionPipeline instance
     """
+    if use_mock:
+        return MockMotionPipeline(device=device)
+        
     # Default weight paths
     if posenet_path is None:
         posenet_path = "models/posenet/weights/posenet_best.pth"

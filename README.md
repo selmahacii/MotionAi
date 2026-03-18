@@ -1,4 +1,4 @@
-# 🏃 MotionAI: Human Motion Intelligence
+# 🏃 Motion Engine by Selma Haci
 
 ##  System Architecture
 

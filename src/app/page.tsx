@@ -12,7 +12,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { 
   Activity, Brain, Eye, TrendingUp, Zap, Play, Pause, RotateCcw,
   Cpu, Layers, Timer, AlertCircle, CheckCircle, Upload, Video,
-  BarChart3, Clock, Target, Motion, Settings, Info, Download,
+  BarChart3, Clock, Target, Move, Settings, Info, Download,
   LineChart, Database
 } from 'lucide-react'
 
@@ -531,13 +531,13 @@ export default function MotionIntelligenceDashboard() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl shadow-lg shadow-emerald-500/20">
-                <Motion className="w-6 h-6" />
+                <Move className="w-6 h-6" />
               </div>
               <div>
                 <h1 className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-                  MotionAI Pro
+                  Motion Engine Pro
                 </h1>
-                <p className="text-xs text-muted-foreground">Human Motion Intelligence System</p>
+                <p className="text-xs text-muted-foreground">Human Motion System by Selma Haci</p>
               </div>
             </div>
             
