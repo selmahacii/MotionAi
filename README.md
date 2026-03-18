@@ -1,6 +1,6 @@
 # 🏃 MotionAI: Human Motion Intelligence
 
-## 🏗️ System Architecture
+##  System Architecture
 
 ```mermaid
 graph TD
@@ -21,7 +21,7 @@ graph TD
     end
 ```
 
-## 🧠 AI Pipeline Details
+##  AI Pipeline Details
 
 ```mermaid
 graph LR
@@ -34,7 +34,7 @@ graph LR
     MF -->|Autoregressive| P[Predicted Motion]
 ```
 
-## 🔄 PoseNet Architecture (Stacked Hourglass)
+##  PoseNet Architecture (Stacked Hourglass)
 
 ```mermaid
 graph LR
@@ -52,7 +52,7 @@ graph LR
     end
 ```
 
-## 📊 Database Schema
+##  Database Schema
 
 ```mermaid
 erDiagram
@@ -75,7 +75,7 @@ erDiagram
     USER ||--o{ POST : writes
 ```
 
-## 🤖 Model Parameters Summary
+## Model Parameters Summary
 
 ```mermaid
 pie title "Approximate Model Parameter Distribution"
@@ -84,7 +84,7 @@ pie title "Approximate Model Parameter Distribution"
     "MoveClassifier (BiLSTM)" : 1.2
 ```
 
-## 📡 Deployment Structure
+##  Deployment Structure
 
 ```mermaid
 graph TB
