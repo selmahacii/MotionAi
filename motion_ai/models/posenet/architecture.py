@@ -263,7 +263,8 @@ class StackedHourglass(nn.Module):
         n_stacks: int = 2,
         n_keypoints: int = NUM_KEYPOINTS,
         n_features: int = 256,
-        input_size: int = 256
+        input_size: int = 256,
+        input_channels: int = 3
     ):
         super().__init__()
         
@@ -410,8 +411,10 @@ class LightweightHourglass(nn.Module):
     
     def __init__(
         self,
+        n_stacks: int = 2,
+        n_features: int = 128,
         n_keypoints: int = NUM_KEYPOINTS,
-        n_features: int = 128
+        input_channels: int = 3
     ):
         super().__init__()
         

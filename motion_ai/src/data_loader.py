@@ -13,7 +13,9 @@ import numpy as np
 from dataclasses import dataclass
 
 import sys
-import os, sys; sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) if 'models' not in str(C:\Users\ZBOOK\Downloads\MotionAi\motion_ai\src\data_loader.py.FullName) else sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+import os, sys
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if project_root not in sys.path: sys.path.insert(0, project_root)
 from src.config import (
     DataConfig, data_config,
     NUM_KEYPOINTS, KEYPOINT_DIM,
